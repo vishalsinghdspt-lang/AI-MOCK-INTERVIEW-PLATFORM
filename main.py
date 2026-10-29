@@ -22,6 +22,7 @@ from db import save_interview
 from db import get_interviews
 
 app = FastAPI()
+os.makedirs("uploads", exist_ok=True)
 
 create_table()
 
