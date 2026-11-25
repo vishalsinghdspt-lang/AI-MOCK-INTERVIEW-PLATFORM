@@ -12,6 +12,7 @@ from fastapi import Form
 from app.evaluator import evaluate_answer
 
 from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles          # NEW
 from fastapi.templating import Jinja2Templates
 
 from parser import extract_text_from_pdf
@@ -21,8 +22,12 @@ from db import create_table
 from db import save_interview
 from db import get_interviews
 
+from renderer import render_markdown, clean_question, build_report   # NEW
+
 app = FastAPI()
 os.makedirs("uploads", exist_ok=True)
+os.makedirs("static", exist_ok=True)                                  # NEW
+app.mount("/static", StaticFiles(directory="static"), name="static")  # NEW
 
 create_table()
 
@@ -31,6 +36,8 @@ interview_data = {}
 templates = Jinja2Templates(
     directory="templates"
 )
+templates.env.filters["md"] = render_markdown              # NEW
+templates.env.filters["question_text"] = clean_question    # NEW
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -67,22 +74,24 @@ async def upload_resume(
     )
 
     questions = generate_questions(
-    resume_text
+        resume_text
     )
 
     interview_data["questions"] = questions
     interview_data["current"] = 0
     interview_data["scores"] = []
     interview_data["answers"] = []
-    
+
     return templates.TemplateResponse(
         request=request,
         name="questions.html",
         context={
             "question": questions[0],
-            "qno": 1
-    }
+            "qno": 1,
+            "total": len(questions)      # NEW
+        }
     )
+
 
 @app.post("/evaluate")
 async def evaluate(
@@ -112,7 +121,8 @@ async def evaluate(
             name="questions.html",
             context={
                 "question": questions[current],
-                "qno": current + 1
+                "qno": current + 1,
+                "total": len(questions)  # NEW
             }
         )
 
@@ -147,9 +157,15 @@ async def evaluate(
         request=request,
         name="result.html",
         context={
-            "result": result
+            "result": result,
+            "report": build_report(result),   # NEW
+            "score": score,                   # NEW
+            "question": question,             # NEW
+            "answer": answer,                 # NEW
+            "total": len(questions)           # NEW
         }
     )
+
 
 @app.get("/history")
 async def history(
@@ -165,6 +181,7 @@ async def history(
             "interviews": interviews
         }
     )
+
 
 @app.post("/clear-history")
 async def clear_history():

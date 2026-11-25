@@ -1,85 +1,147 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
+{% set active_page = 'history' %}
+{% block title %}Interview History · AI Mock Interview{% endblock %}
 
-<head>
+{% block content %}
 
-<link
-href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-rel="stylesheet">
+{# ---- real stats from the saved records ---- #}
+{% set ns = namespace(sum=0, count=0, best=none) %}
+{% for i in interviews %}
+  {% if i[3] and i[3] != 'N/A' and '/' in i[3] %}
+    {% set v = i[3].split('/')[0]|int %}
+    {% set ns.sum = ns.sum + v %}
+    {% set ns.count = ns.count + 1 %}
+    {% if ns.best is none or v > ns.best %}{% set ns.best = v %}{% endif %}
+  {% endif %}
+{% endfor %}
 
-<title>Interview History</title>
+<section class="container history">
 
-</head>
+  <header class="history-head reveal">
+    <div>
+      <span class="eyebrow">Progress</span>
+      <h1 class="h-page">Your Interview History</h1>
+      <p class="lead">Review your previous sessions and track your interview preparation.</p>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <a class="btn btn-primary" href="/">New Interview</a>
+      {% if interviews %}
+      <button class="btn btn-danger-ghost" type="button" data-open="clearDialog">Clear History</button>
+      {% endif %}
+    </div>
+  </header>
 
-<body>
+  {% if interviews %}
 
-<div class="container mt-5">
+  <div class="stats">
+    <div class="stat card-glass reveal"><span>Total interviews</span><strong>{{ interviews|length }}</strong></div>
+    <div class="stat card-glass reveal" style="--d:.05s"><span>Average score</span><strong>{% if ns.count %}{{ (ns.sum / ns.count)|round(1) }}<small class="muted" style="font-size:15px"> / 10</small>{% else %}—{% endif %}</strong></div>
+    <div class="stat card-glass reveal" style="--d:.1s"><span>Best score</span><strong>{% if ns.best is not none %}{{ ns.best }}<small class="muted" style="font-size:15px"> / 10</small>{% else %}—{% endif %}</strong></div>
+    <div class="stat card-glass reveal" style="--d:.15s"><span>Most recent</span><strong class="sm">{{ interviews[0][4] }}</strong></div>
+  </div>
 
-    <h1 class="mb-4">
-        📊 Interview History
-    </h1>
+  <div class="toolbar reveal">
+    <div class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="hSearch" type="search" placeholder="Search by answer, ID or date…" aria-label="Search interviews">
+    </div>
+    <select class="select" id="hFilter" aria-label="Filter by performance">
+      <option value="all">All scores</option>
+      <option value="s-great">Excellent (8–10)</option>
+      <option value="s-good">Good (6–7)</option>
+      <option value="s-fair">Fair (4–5)</option>
+      <option value="s-low">Needs work (0–3)</option>
+      <option value="s-na">Not scored</option>
+    </select>
+    <select class="select" id="hSort" aria-label="Sort interviews">
+      <option value="newest">Newest first</option>
+      <option value="oldest">Oldest first</option>
+      <option value="high">Highest score</option>
+      <option value="low">Lowest score</option>
+    </select>
+  </div>
+  <p class="muted small" id="resultCount" style="margin-bottom:12px"></p>
 
-    <form action="/clear-history" method="post" style="margin-bottom:20px;">
-        <button
-            type="submit"
-            onclick="return confirm('Delete all interview history?')"
-            class="btn btn-danger">
-            🗑 Clear All History
-        </button>
-    </form>
+  <div class="h-list" id="historyList">
+    {% for i in interviews %}
+    {% set has = (i[3] and i[3] != 'N/A' and '/' in i[3]) %}
+    {% set sv = i[3].split('/')[0]|int if has else -1 %}
+    {% set band = 's-na' if sv < 0 else ('s-great' if sv >= 8 else ('s-good' if sv >= 6 else ('s-fair' if sv >= 4 else 's-low'))) %}
+    {% set label = {'s-na':'Not scored','s-great':'Excellent','s-good':'Good','s-fair':'Fair','s-low':'Needs work'}[band] %}
+    <article class="h-row"
+      data-id="{{ i[0] }}" data-score="{{ sv }}" data-band="{{ band }}"
+      data-date="{{ i[4] }}" data-scoretext="{{ i[3] or '' }}" data-answer="{{ i[1] }}"
+      data-search="{{ ('#' ~ i[0] ~ ' ' ~ (i[1] or '') ~ ' ' ~ (i[3] or '') ~ ' ' ~ (i[4] or ''))|lower }}">
+      <div class="h-id">#{{ i[0] }}</div>
+      <div class="h-main"><p class="h-answer">{{ (i[1] or '')|truncate(130) }}</p></div>
+      <div class="h-date">{{ i[4] }}</div>
+      <div class="h-score"><span class="score-pill {{ band }}">{{ i[3] or 'N/A' }}</span></div>
+      <div class="h-status"><span class="badge {{ band }}">{{ label }}</span></div>
+      <div class="h-act"><button class="btn btn-ghost btn-sm" type="button" data-view>View details</button></div>
+      <template class="h-eval">{{ i[2]|md }}</template>
+    </article>
+    {% endfor %}
+  </div>
 
-    <table class="table table-bordered table-striped">
+  <div class="empty card-glass" id="hEmpty" hidden>
+    <h2>No interviews match</h2>
+    <p>Try a different search or filter.</p>
+  </div>
 
-        <thead>
+  <div class="pager" id="pager">
+    <span id="pageInfo"></span>
+    <div>
+      <button class="btn btn-ghost btn-sm" type="button" id="prevPage">Previous</button>
+      <button class="btn btn-ghost btn-sm" type="button" id="nextPage">Next</button>
+    </div>
+  </div>
 
-            <tr>
+  {% else %}
 
-                <th>ID</th>
-                <th>Answer</th>
-                <th>Evaluation</th>
-                <th>Score</th>
-                <th>Date</th>
+  <div class="empty card-glass reveal">
+    <div class="f-icon" style="margin:0 auto">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2"/></svg>
+    </div>
+    <h2>No interviews yet</h2>
+    <p>Complete a mock interview and your results will appear here.</p>
+    <a class="btn btn-primary" href="/#start">Start Your Interview</a>
+  </div>
 
-            </tr>
+  {% endif %}
+</section>
 
-        </thead>
+<!-- ===== details dialog ===== -->
+<dialog id="detailDialog">
+  <div class="dlg-head">
+    <div>
+      <h3 id="dId">Interview</h3>
+      <div class="meta"><span id="dDate"></span><span class="score-pill" id="dScore"></span></div>
+    </div>
+    <button class="icon-btn" type="button" data-close aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="dlg-scroll">
+    <div><h4>Your answer</h4><div class="answer-box" id="dAnswer"></div></div>
+    <div><h4>AI evaluation</h4><div class="prose" id="dEval"></div></div>
+  </div>
+</dialog>
 
-        <tbody>
+<!-- ===== clear-history confirmation ===== -->
+<form action="/clear-history" method="post">
+  <dialog id="clearDialog" class="dlg-sm">
+    <div class="dlg-body">
+      <div class="dlg-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1L5 6M10 11v6M14 11v6"/></svg>
+      </div>
+      <h3>Clear all history?</h3>
+      <p>This permanently deletes all {{ interviews|length }} saved interviews. This can’t be undone.</p>
+    </div>
+    <div class="dlg-actions">
+      <button class="btn btn-ghost" type="button" data-close>Cancel</button>
+      <button class="btn btn-danger" type="submit">Yes, delete everything</button>
+    </div>
+  </dialog>
+</form>
 
-            {% for interview in interviews %}
-
-            <tr>
-
-                <td>
-                    {{ interview[0] }}
-                </td>
-
-                <td>
-                    {{ interview[1] }}
-                </td>
-
-                <td>
-                    {{ interview[2] }}
-                </td>
-
-                <td>
-                    {{ interview[3] }}
-                </td>
-
-                <td>
-                    {{ interview[4] }}
-                </td>
-
-            </tr>
-
-            {% endfor %}
-
-        </tbody>
-
-    </table>
-
-</div>
-
-</body>
-
-</html>
+{% endblock %}

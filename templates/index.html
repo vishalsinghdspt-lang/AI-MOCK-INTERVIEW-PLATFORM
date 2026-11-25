@@ -1,111 +1,164 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
+{% set active_page = 'home' %}
+{% block title %}AI Mock Interview — Your Personal AI Interview Coach{% endblock %}
 
-<head>
+{% block content %}
 
-    <title>AI Mock Interview</title>
-
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet">
-
-    <style>
-
-        body{
-            background: linear-gradient(
-                135deg,
-                #0f172a,
-                #1e293b
-            );
-
-            height:100vh;
-
-            display:flex;
-
-            justify-content:center;
-
-            align-items:center;
-        }
-
-        .upload-card{
-
-            background:white;
-
-            width:500px;
-
-            padding:40px;
-
-            border-radius:20px;
-
-            box-shadow:
-            0 10px 40px rgba(
-                0,
-                0,
-                0,
-                0.3
-            );
-
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-    <div class="upload-card">
-
-        <h1
-            class="text-center fw-bold">
-
-            🎤 AI Mock Interview
-
-        </h1>
-
-        <p
-            class="text-center text-muted">
-
-            Upload your resume and let AI conduct your interview
-
-        </p>
-
-        <form
-            action="/upload"
-            method="post"
-            enctype="multipart/form-data">
-
-            <div class="mb-3">
-
-                <input
-                    class="form-control"
-                    type="file"
-                    name="resume"
-                    required>
-
-            </div>
-
-            <button
-                class="btn btn-primary w-100"
-                type="submit">
-
-                Generate Questions
-
-            </button>
-
-            <br><br>
-
-            <a
-                href="/history"
-                class="btn btn-outline-dark w-100">
-
-                📊 Interview History
-
-            </a>
-
-        </form>
-
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="eyebrow reveal">Your personal AI interview coach</span>
+      <h1 class="h-display reveal" style="--d:.08s">
+        Walk Into Every Interview With <span class="grad">Confidence.</span>
+      </h1>
+      <p class="lead reveal" style="--d:.16s">
+        Practice smarter with AI-powered mock interviews, personalized technical questions and intelligent feedback designed to help you perform at your best.
+      </p>
+      <div class="hero-cta reveal" style="--d:.24s">
+        <a class="btn btn-primary btn-lg" href="#start">Start Your Interview</a>
+        <a class="btn btn-ghost btn-lg" href="#how">Explore How It Works</a>
+      </div>
+      <div class="trust reveal" style="--d:.3s"><i></i>Powered by AI Intelligence</div>
     </div>
 
-</body>
+    <div class="hero-visual reveal" style="--d:.15s" aria-hidden="true">
+      <div class="hv-glow"></div>
+      <div class="mock card-glass">
+        <div class="mock-top"><i></i><i></i><i></i><span class="mock-tag">Interface preview</span></div>
+        <div class="mock-body">
+          <div class="mock-meta">
+            <span class="badge badge-indigo">Question 3</span>
+            <div class="mock-prog"><i></i></div>
+          </div>
+          <p class="mock-q">Tell me about a project where you had to handle an unreliable third-party API. What was your approach?</p>
+          <div class="mock-editor"><span>Structure your response clearly…</span><span class="caret"></span></div>
+          <div class="mock-ai">
+            <span class="ai-dot"></span><span>AI analysis</span>
+            <div class="wave">{% for n in range(26) %}<span></span>{% endfor %}</div>
+          </div>
+        </div>
+      </div>
+      <div class="float-chip fc-1">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5zM14 3v5h5M9 13h6M9 17h6"/></svg>
+        Resume-based questions
+      </div>
+      <div class="float-chip fc-2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/></svg>
+        Detailed AI feedback
+      </div>
+    </div>
+  </div>
+</section>
 
-</html>
+<!-- ============ UPLOAD ============ -->
+<section class="section" id="start">
+  <div class="container narrow">
+    <div class="upload-wrap card-glass reveal">
+      <div class="upload-head">
+        <span class="eyebrow">Get started</span>
+        <h2 class="h-section">Upload Your Resume</h2>
+        <p class="muted">Drop your resume here or browse files. Your questions are generated from your own experience.</p>
+      </div>
+
+      <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data" novalidate>
+        <label class="dropzone" id="dropzone" for="resume">
+          <input class="sr-only" type="file" id="resume" name="resume" accept=".pdf,application/pdf" required>
+          <div class="dz-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5zM14 3v5h5M12 18v-6M9.5 14.5 12 12l2.5 2.5"/></svg>
+          </div>
+          <div class="dz-title"><strong>Drop your resume here</strong> or <span class="link">browse files</span></div>
+          <div class="dz-hint">Supported format: PDF</div>
+        </label>
+
+        <div class="file-chip" id="fileChip" hidden>
+          <div class="fi">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5zM14 3v5h5M9 13h6M9 17h6"/></svg>
+          </div>
+          <div class="file-info">
+            <div class="file-name" id="fileName"></div>
+            <div class="file-size" id="fileSize"></div>
+          </div>
+          <button class="icon-btn" id="fileRemove" type="button" aria-label="Remove file">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+
+        <p class="field-error" id="fileError" role="alert" hidden></p>
+
+        <button class="btn btn-primary btn-lg btn-block" id="uploadBtn" type="submit">
+          <span class="btn-label">Generate Questions</span><span class="spinner"></span>
+        </button>
+      </form>
+
+      <a class="btn btn-ghost btn-block" href="/history">Interview History</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+{% set features = [
+  {"t": "AI-powered questions", "p": "Interview questions are generated by Gemini, so every session feels different.", "d": "M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"},
+  {"t": "Resume-based personalization", "p": "Your own projects, skills and experience shape what you get asked.", "d": "M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5zM14 3v5h5M9 13h6M9 17h6"},
+  {"t": "Technical interview practice", "p": "Practise explaining your approach, trade-offs and reasoning out loud in writing.", "d": "M16 18l6-6-6-6M8 6l-6 6 6 6"},
+  {"t": "Intelligent answer evaluation", "p": "Get a score out of 10 with a clear breakdown of how your answer landed.", "d": "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zM12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"},
+  {"t": "Improvement recommendations", "p": "See strengths, weaknesses and a stronger sample answer to learn from.", "d": "M3 17l6-6 4 4 8-8M14 7h7v7"},
+  {"t": "History & progress tracking", "p": "Every evaluated interview is saved so you can review your scores over time.", "d": "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2"}
+] %}
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Features</span>
+      <h2 class="h-section">Everything you need to prepare with intent.</h2>
+      <p class="muted">A focused toolkit for turning your resume into real interview practice.</p>
+    </div>
+    <div class="grid-3">
+      {% for f in features %}
+      <article class="feature card-glass lift reveal" style="--d:{{ loop.index0 * 0.07 }}s">
+        <div class="f-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ f.d }}"/></svg>
+        </div>
+        <h3>{{ f.t }}</h3>
+        <p>{{ f.p }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="section" id="how">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">How it works</span>
+      <h2 class="h-section">From resume to feedback in four steps.</h2>
+    </div>
+    <div class="grid-4">
+      {% set steps = [
+        ("Upload your resume", "Add your resume as a PDF."),
+        ("Generate questions", "AI writes interview questions based on your background."),
+        ("Answer the questions", "Respond one question at a time in a focused workspace."),
+        ("Receive AI feedback", "Get a score, strengths, improvements and a better answer.")
+      ] %}
+      {% for s in steps %}
+      <article class="step card-glass lift reveal" style="--d:{{ loop.index0 * 0.08 }}s">
+        <div class="step-num">STEP 0{{ loop.index }}</div>
+        <h3>{{ s[0] }}</h3>
+        <p>{{ s[1] }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section class="section">
+  <div class="container narrow">
+    <div class="cta-band card-glass reveal">
+      <h2 class="h-section">Your Next Interview Starts Here.</h2>
+      <a class="btn btn-primary btn-lg" href="#start">Start Practicing</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
