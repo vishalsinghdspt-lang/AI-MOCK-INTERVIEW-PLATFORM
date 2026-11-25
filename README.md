@@ -4,26 +4,6 @@ An AI-powered mock interview app. Upload your resume, get personalized technical
 
 Built with **FastAPI**, **Google Gemini** and **SQLite**, with a custom dark UI that needs no frontend build step.
 
----
-
-## Table of Contents
-
-- [Features](#features)
-- [Screenshots](#screenshots)
-- [Tech Stack](#tech-stack)
-- [How It Works](#how-it-works)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Configuration](#configuration)
-- [Routes](#routes)
-- [Database](#database)
-- [Security](#security)
-- [Known Limitations](#known-limitations)
-- [Roadmap](#roadmap)
-- [Troubleshooting](#troubleshooting)
-- [License](#license)
-
----
 
 ## Features
 
@@ -52,20 +32,6 @@ Built with **FastAPI**, **Google Gemini** and **SQLite**, with a custom dark UI 
 - Staggered entrance animations and an ambient animated background
 - Responsive layout for desktop, tablet and mobile
 - Respects `prefers-reduced-motion`
-
----
-
-## Screenshots
-
-> Add your own screenshots to `docs/screenshots/` and update the paths below.
-
-| Landing page | Interview workspace |
-|---|---|
-| ![Landing](docs/screenshots/landing.png) | ![Questions](docs/screenshots/questions.png) |
-
-| Evaluation result | Interview history |
-|---|---|
-| ![Result](docs/screenshots/result.png) | ![History](docs/screenshots/history.png) |
 
 ---
 
@@ -185,28 +151,6 @@ Open **http://127.0.0.1:8000** in your browser.
 
 ---
 
-## Configuration
-
-Create a `.env` file in the project root:
-
-```env
-GEMINI_API_KEY=your_api_key_here
-```
-
-> The variable name must match the one read in `gemini_client.py`.
-
-Never commit `.env`. Make sure `.gitignore` contains at least:
-
-```gitignore
-.env
-venv/
-__pycache__/
-uploads/
-interview.db
-```
-
----
-
 ## Routes
 
 | Method | Route | Description |
@@ -283,5 +227,5 @@ SQLite file `interview.db`, created automatically on first run.
 
 ## Author
 
-**Your Name**
+**Vishal Singh**
 GitHub: [@vishalsinghdspt-lang](https://github.com/vishalsinghdspt-lang)
